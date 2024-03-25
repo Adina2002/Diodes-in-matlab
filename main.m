@@ -1,0 +1,14 @@
+clc;
+close all;
+clear all;
+A=5;
+R=10^3;
+tipS=2;
+tipD=1;
+f=100;
+n=1.1;
+T=300;
+bv=-65;
+vf=0.761;
+interfata_dioda(A,T,f,R,vf,tipS,tipD);
+calcul_dioda(A,T,f,R,vf,tipS,tipD);

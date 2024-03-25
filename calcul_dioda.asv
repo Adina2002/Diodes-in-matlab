@@ -1,0 +1,97 @@
+function calcul_dioda(A,T,f,R,vf,tipS,tipD)
+t=0:1/100/f:12/f;
+iS=10^(-12);%curentul de saturatie in amp
+k=1.38065e-23;% constanta lui Boltzmann J/K
+q=1.602e-19;% sarcina electronilor in C
+v0=0;%inceputul tensiunii pentru reprezentare
+vend=1.1 ;%sfarsitul tensiunii pentru reprezentare
+Vd=v0:0.01:vend;%tensiunea pentru reprezentare
+switch tipD
+    case 1
+        vf=0.761;
+        n=1.1;
+    case 2
+        vf=0.279;
+        n=1.4;
+    case 3
+        vf=1.8;
+        n=1.5;
+    case 4
+        vf=3.5;
+        n=1.5;
+     
+    case 5
+        vf=3.6;
+        n=1.6;
+     
+
+end
+for ii=v0:0.01:vend
+    if ii>vf
+id = iS*(exp((q*Vd)./(n*k*T))-1);%Calculam curentul pe dioda
+    else
+        id=0;
+    end
+end
+subplot(2,3,4);
+plot(Vd-0.2,id,'b');%afisam dependenta curentului in functie de tensiune
+hold on
+grid on;
+%title('\bf Afisarea Curentului din dioda in functie de tensiune');
+xlabel('V');
+ylabel('I');
+switch tipS
+    case 1
+        if A>=vf
+        vo=vf*ones(length(t));
+        i0=(A-vf)/R*ones(length(t));
+        else
+            vo=A*ones(length(t));
+            i0=0;
+        end
+    case 2
+        vo=(A+vf)/2*sin(2*pi*f*t)-(A-vf)/2;
+        if A>=vf
+        i0=(A-vf)/R/2*(sin(2*pi*f*t)+abs(sin(2*pi*f*t)));
+        else
+            i0=0;
+        end
+    case 3
+        vo=(A+vf)/2*sign(sin(2*pi*f*t))-(A-vf)/2;
+        if A>=vf
+        i0=(A-vf)/R*(1/2*sign(sin(2*pi*f*t))+abs(1/2*sign(sin(2*pi*f*t))));
+        else
+            i0=0;
+        end
+    case 4
+            vo=(A+vf)/2*sawtooth(2*pi*f*t,1/2)-(A-vf)/2;
+            i0=(A-vf)/R*(1/2*sawtooth(2*pi*f*t,1/2)+abs(1/2*sawtooth(2*pi*f*t,1/2)));
+end
+subplot(2,3,5);
+plot(t,vo,'g',t,100*i0,'y');    
+    v0t=0;%inceputul tensiunii pentru reprezentare
+    vendt=1.1 ;%sfarsitul tensiunii pentru reprezentare
+    v=v0t:0.01:vendt;
+    vce = v(1);%tensiunea curent emitor
+    vbe = v(2);%tensiunea baza emitor
+    N=1.1;%factorul de idealitate;
+    Bf=0.998;%castigul de curent Beta
+    Br=Bf;
+    vbc = vbe - vce;% Calcularea tensiunii baza-colector 
+    NVt = 25.83e-3*N;
+    % Factorul de castig invers.
+    ar = ((Br + 1)/Br);
+    Is=0.001;
+    % Calcularea curentilor directi si inversi
+    If = Is*(exp(vbe/NVt) - 1);
+    Ir = Is*(exp(vbc/NVt) - 1);
+
+    % Calcularea curentului de colector si baza
+    Ic = If - (Ir*ar);
+    Ib = If/Bf + Ir/Br;
+    I = [Ic; Ib];
+     % subplot(2,3,6);
+     % plot(vbe,I); Aici am incercat sa reprezint curentul in functie de
+     % tensiune.
+end
+
